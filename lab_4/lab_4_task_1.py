@@ -8,8 +8,8 @@ def f(x):
 
 
 # Интеграл с использованием scipy.integrate.quad
-true_integral, _ = quad(f, 0, np.pi)
-
+true_integral, err = quad(f, 0, np.pi)
+print(true_integral, err)
 
 # Метод трапеций
 def trapezoidal_rule(f, a, b, n):

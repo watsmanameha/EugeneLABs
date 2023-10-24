@@ -13,8 +13,8 @@ potential = a * (x**2 + y**2)
 dx, dy = np.gradient(potential)
 electric_field = np.sqrt(dx**2 + dy**2)
 
-np.savetxt('potential.txt', potential)
-np.savetxt('electric_field.txt', electric_field)
+np.savetxt('potential.txt', potential, delimiter=' ')
+np.savetxt('electric_field.txt', electric_field, delimiter=' ')
 
 fig=plt.figure(figsize=(20, 10))
 axes_1 = fig.add_subplot(1, 2, 1, projection='3d')
