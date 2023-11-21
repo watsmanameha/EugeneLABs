@@ -1,4 +1,6 @@
 from PIL import Image
+import numpy as np
+import numba
 import timeit
 
 # Загрузка изображения
@@ -10,22 +12,29 @@ im = Image.open(image_path)
 if original_image.mode != "RGB":
     original_image = original_image.convert("RGB")
 
-# Удаление красного канала
-def remove_red_channel(image):
-    r, g, b = image.split()
-    return Image.merge("RGB", (r.point(lambda i: i*0), g, b))
+# Удаление красного канала в верхней части изображения с использованием Numba
+@numba.njit(parallel=True)
+def remove_red_channel_numba(image_array):
+    for x in numba.prange(width):
+        for y in numba.prange(height):
+            # Проверяем, находится ли пиксель выше или на диагонали
+            if y <= x * height / width:
+                image_array[y, x, 0] = 0  # Устанавливаем красный канал в 0
 
-# Засекаем время выполнения
-execution_time = timeit.timeit(lambda: remove_red_channel(original_image), number=1)
+# Преобразование изображения в массив NumPy
+img_array = np.array(original_image)
 
-# Удаление красного канала
-result_image = remove_red_channel(original_image)
+# Засекаем время выполнения с Numba
+execution_time_numba = timeit.timeit(lambda: remove_red_channel_numba(img_array), number=1)
+
+# Преобразование обратно в изображение
+result_image_numba = Image.fromarray(img_array)
 
 # Сохранение нового файла
-result_image.save("output_image.jpg")
+result_image_numba.save("output_image_numba.jpg")
 
-print(f"Удаление красного канала заняло {execution_time:.2f} секунд")
+print(f"Удаление красного канала с использованием Numba заняло {execution_time_numba:.2f} секунд")
 print(width, height)
 # Освобождаем ресурсы
 original_image.close()
-result_image.close()
+result_image_numba.close()
