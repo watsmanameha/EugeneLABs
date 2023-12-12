@@ -2,37 +2,28 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
-# Начальные частоты
-freq_x = 100  # Герц
-freq_y = 300  # Герц
+fig = plt.figure()
+ax = plt.subplot()
+plt.plot(0, 0)
 
-# Небольшое отличие частот
-delta_freq_x = 0.1
-delta_freq_y = 0.2
+t = np.linspace(-2 * np.pi, 2 * np.pi, 200)
+initial_frequency_x = 100
+initial_frequency_y = 200
 
-# Временной интервал и количество точек
-dt = 0.01
-num_points = 1000
+def animate(i):
+    if i < 500: # Если текущий кадр в первой половине анимации
+        frequency_x = initial_frequency_x + 0.01 * i # частота изменяется линейно
+        frequency_y = initial_frequency_y # частота по y = const
+    else:
+        frequency_x = initial_frequency_x + 0.01 * (1000 - i) # Частота по оси x уменьшается линейно с увеличением i от 500 до 1000
+        frequency_y = initial_frequency_y
+    x = np.sin(frequency_x * t + np.pi/4)
+    y = np.sin(frequency_y * t)
+    ax.clear()
+    plt.plot(x, y, lw='5')
+    ax.set_xlabel('Время')
+    ax.set_ylabel('Амплитуда')
 
-# Функция для обновления графика в анимации
-def update(frame):
-    global freq_x, freq_y
+    return fig,
 
-    # Обновление частот с небольшим отличием
-    freq_x += delta_freq_x
-    freq_y += delta_freq_y
-
-    t = np.linspace(0, 1, num_points)
-    x = np.sin(2 * np.pi * freq_x * t)
-    y = np.sin(2 * np.pi * freq_y * t)
-
-    # Очищаем предыдущий график и рисуем новый
-    plt.clf()
-    plt.plot(x, y)
-    plt.title(f'Lissajous Figure: {freq_x} Hz vs {freq_y} Hz')
-
-# Создаем анимацию
-ani = FuncAnimation(plt.figure(), update, frames=range(100), interval=100)
-
-# Сохраняем анимацию в файл GIF
-ani.save('lissajous_animation.gif', writer='pillow', fps=15)
+ani = FuncAnimation(fig, animate, frames=1000, interval=20, blit=False)
